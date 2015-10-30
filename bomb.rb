@@ -45,7 +45,7 @@ class Bomb
 			@remove = true;
 		end
 		if @exploded && !@hurt_player && Gosu::distance(@x, @y, @player.x, @player.y) <= @radius
-			@player.hurt(100)
+			@player.hurt(10)
 			@hurt_player = true
 		end
 	end

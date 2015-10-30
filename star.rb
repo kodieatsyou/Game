@@ -3,7 +3,8 @@ require_relative "z_order"
 
 class Star
 
-	attr_reader :x, :y
+	attr_reader :x, :y, :points
+	attr_accessor :zoomlvl, :color, :points
 
 	def initialize(animation)
 		@animation = animation
@@ -11,9 +12,12 @@ class Star
 		@color.red = random_color_component_not_too_dark
 		@color.green = random_color_component_not_too_dark
 		@color.blue = random_color_component_not_too_dark
+		@points = 1
 
 		@x = rand * 640
 		@y = rand * 480
+
+		@zoomlvl = 1
 	end
 
 	def draw
@@ -22,7 +26,7 @@ class Star
 			@x - img.width / 2.0,
 			@y - img.height / 2.0,
 			ZOrder::STARS,
-			1, 1, @color, :add)
+			zoomlvl, zoomlvl, color, :add)
 	end
 
 	private

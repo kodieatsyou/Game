@@ -2,10 +2,12 @@ require "gosu"
 require_relative "z_order"
 require_relative "star"
 require_relative "bomb"
+require_relative "laser"
+require_relative "healthpack"
 
 class Player
 
-	attr_accessor :health, :x, :y
+	attr_accessor :health, :x, :y, :lasers
 
 	TURN_INCREMENT = 2.5
 	ACCELERATION = 0.2
@@ -17,6 +19,9 @@ class Player
 		@image = Gosu::Image.new("media/starfighter.bmp")		
 		@beep = Gosu::Sample.new("media/beep.wav")
 		@health = 100
+		@can_shoot = true
+		@shoot_delay = 4000
+		@lasers = []
 	end
 
 	def warp(x, y)
@@ -60,12 +65,14 @@ class Player
 	end
 
 	def collect_stars(stars)
-		if stars.reject! {|star| colliding_with_star?(star)}
-			@score += 1
+		stars.reject!  do |star| 
+			if colliding_with_star?(star)
+			@score += star.points
 			@beep.play
 			true
-		else
+			else
 			false
+			end
 		end
 	end
 
@@ -73,9 +80,37 @@ class Player
 		@health -= health
 	end
 
+	def shoot
+		if @can_shoot == true
+			@lasers.push(Laser.new(@x,@y,@angle)) 
+			@can_shoot = false
+			@shoot_delay = Gosu::milliseconds + 500
+		end
+	end
+
+	def shoot_delay
+		if Gosu::milliseconds > @shoot_delay
+			@can_shoot = true
+		end
+	end
+
+	def collect_healthpack(healthpack)
+		healthpacks.reject!  do |pack| 
+		if colliding_with_pack?(pack)
+			@health += healthpack.health
+			true
+		else
+			false
+		end
+	end
+end
+
 	private
 
 		def colliding_with_star?(star)
 			Gosu::distance(@x, @y, star.x, star.y) < COLLISION_DISTANCE
+		end
+		def colliding_with_pack?(healthpack)
+			Gosu::distance(@x, @y, healthpack.x, healthpack.y) < COLLISION_DISTANCE
 		end
 end
